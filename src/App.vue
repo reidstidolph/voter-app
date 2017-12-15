@@ -10,11 +10,18 @@
       clipped
       app
     >
-      <v-flex>
-        <v-avatar size="36px">
-          <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc">
-        </v-avatar>
-      </v-flex>
+      <v-list>
+        <v-list-tile>
+          Votes
+        </v-list-tile>
+        <v-list-tile v-for="n in myVotes">
+            <v-avatar size="45px">
+              <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc?s=45">
+            </v-avatar>
+        </v-list-tile>
+      </v-list>
+
+
     </v-navigation-drawer>
 
 <!--############################################################################
@@ -30,15 +37,34 @@
     <v-content>
       <v-container fluid>
         <v-layout column align-center>
-          <img src="/public/v.png" alt="Vuetify.js" class="mb-5" />
-          <blockquote>
-            &#8220;First, solve the problem. Then, write the code.&#8221;
-            <footer>
-              <small>
-                <em>&mdash;John Johnson</em>
-              </small>
-            </footer>
-          </blockquote>
+          <v-data-table
+            v-bind:headers="gamesTable.headers"
+            v-bind:pagination.sync="gamesTable.pagination"
+            :items="gamesTable.items"
+            class="elevation-1"
+            hide-actions
+            hide-headers
+          >
+          <template slot="items" slot-scope="props">
+            <td>
+              <v-btn fab small @click.native="castVote(props.item)">
+                <v-icon dark>add</v-icon>
+              </v-btn>
+              <v-btn fab small @click.native="retractVote(props.item)">
+                <v-icon dark>remove</v-icon>
+              </v-btn>
+            </td>
+            <td>
+              {{ props.item.name }}
+            </td>
+            <td>
+              <v-avatar size="45px" v-for="n in props.item.votes">
+                <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc?s=45">
+              </v-avatar>
+              {{ props.item.votes }}
+            </td>
+          </template>
+        </v-data-table>
         </v-layout>
       </v-container>
     </v-content>
@@ -57,7 +83,54 @@
 <script>
   export default {
     data () {
-      return {}
+      return {
+        myVotes: 5,
+        gamesTable: {
+          pagination: {
+            sortBy: 'votes',
+            descending: true
+          },
+          headers: [
+            {
+              text: "Game Title",
+              value: "name",
+              sortable: false
+            },
+            {
+              text: "Votes",
+              value: "votes"
+            }
+          ],
+          items: [
+            {
+              name: "game1",
+              votes: 1
+            },
+            {
+              name: "game2",
+              votes: 3
+            },
+            {
+              name: "game3",
+              votes: 2
+            }
+          ]
+        }
+      }
+    },
+    methods: {
+      castVote(item){
+        if (this.myVotes > 0) {
+          item.votes +=1;
+          this.myVotes -=1;
+        }
+      },
+      retractVote(item){
+        if (this.myVotes < 5 && item.votes > 0) {
+          item.votes -=1;
+          this.myVotes +=1;
+        }
+      }
     }
   }
 </script>
