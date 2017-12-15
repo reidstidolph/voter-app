@@ -28,7 +28,7 @@
   Top toolbar
 #############################################################################-->
     <v-toolbar fixed app clipped-left>
-
+      <v-toolbar-title>Pollster</v-toolbar-title>
     </v-toolbar>
 
 <!--############################################################################
@@ -46,7 +46,7 @@
             hide-headers
           >
           <template slot="items" slot-scope="props">
-            <td>
+            <td style="width: 50px">
               <v-btn fab small @click.native="castVote(props.item)">
                 <v-icon dark>add</v-icon>
               </v-btn>
@@ -58,10 +58,10 @@
               {{ props.item.name }}
             </td>
             <td>
+              {{ props.item.votes }}
               <v-avatar size="45px" v-for="n in props.item.votes">
                 <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc?s=45">
               </v-avatar>
-              {{ props.item.votes }}
             </td>
           </template>
         </v-data-table>
@@ -103,15 +103,15 @@
           ],
           items: [
             {
-              name: "game1",
+              name: "Battlefield 4",
               votes: 1
             },
             {
-              name: "game2",
+              name: "Call of Duty: Modern Warfare 2",
               votes: 3
             },
             {
-              name: "game3",
+              name: "Left4Dead",
               votes: 2
             }
           ]
