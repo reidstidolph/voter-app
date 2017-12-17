@@ -16,7 +16,7 @@
         </v-list-tile>
         <v-list-tile v-for="n in myUser.votes">
             <v-avatar size="45px">
-              <img :src="myUser.gravatar">
+              <img :src="users[myUser.id].gravatar">
             </v-avatar>
         </v-list-tile>
       </v-list>
@@ -47,10 +47,10 @@
           >
           <template slot="items" slot-scope="props">
             <td style="width: 50px">
-              <v-btn fab small @click.native="castVote(props.item)">
+              <v-btn v-if="!props.item.myVote && myUser.votes > 0" fab small @click.native="castVote(props.item)">
                 <v-icon dark>add</v-icon>
               </v-btn>
-              <v-btn fab small @click.native="retractVote(props.item)">
+              <v-btn v-if="props.item.myVote" fab small @click.native="retractVote(props.item)">
                 <v-icon dark>remove</v-icon>
               </v-btn>
             </td>
@@ -84,90 +84,125 @@
   import md5 from 'md5';
   import _ from 'lodash';
 
-  export default {
-    data () {
-      return {
-        myUser: {
-          name: "Reid Stidolph",
-          email: "reidstidolph@gmail.com",
-          gravatar: null,
-          votes: 5
+  const userVoteCount = 3;
+
+  var vueState = {
+    myUser: {
+      id : "d4",
+      votes: userVoteCount
+    },
+    users: {
+      a1 : {
+        name: "Lambert Green",
+        email: "lambert_green@msn.com",
+        gravatar: null
+      },
+      b2 : {
+        name: "Ryan Hellevang",
+        email: "ryan@hellevang.us",
+        gravatar: null
+      },
+      c3 : {
+        name: "Jane Doe",
+        email: "jane@foo.com",
+        gravatar: null
+      },
+      d4 : {
+        name: "Reid Stidolph",
+        email: "reidstidolph@gmail.com",
+        gravatar: null,
+      }
+    },
+    gamesTable: {
+      pagination: {
+        sortBy: 'votes.length',
+        descending: true
+      },
+      headers: [
+        {
+          text: "Game Title",
+          value: "name",
+          sortable: false
         },
-        users: {
-          a1 : {
-            name: "Bob Jones",
-            email: "bob@foo.com",
-            gravatar: null
-          },
-          b2 : {
-            name: "Bill Bob",
-            email: "bill@foo.com",
-            gravatar: null
-          },
-          c3 : {
-            name: "Jane Doe",
-            email: "jane@foo.com",
-            gravatar: null
-          }
+        {
+          text: "Votes",
+          value: "votes"
+        }
+      ],
+      items: [
+        {
+          name: "Battlefield 4",
+          myVote: false,
+          votes: [
+            "a1"
+          ]
         },
-        gamesTable: {
-          pagination: {
-            sortBy: 'votes',
-            descending: true
-          },
-          headers: [
-            {
-              text: "Game Title",
-              value: "name",
-              sortable: false
-            },
-            {
-              text: "Votes",
-              value: "votes"
-            }
-          ],
-          items: [
-            {
-              name: "Battlefield 4",
-              votes: [
-                "a1"
-              ]
-            },
-            {
-              name: "Call of Duty: Modern Warfare 2",
-              votes: [
-                "a1",
-                "b2"
-              ]
-            },
-            {
-              name: "Left4Dead",
-              votes: [
-                "a1",
-                "b2",
-                "c3"
-              ]
-            }
+        {
+          name: "Call of Duty: Modern Warfare 2",
+          myVote: false,
+          votes: [
+            "a1",
+            "b2"
+          ]
+        },
+        {
+          name: "Left4Dead",
+          myVote: false,
+          votes: [
+            "a1",
+            "b2",
+            "c3"
+          ]
+        },
+        {
+          name: "Age of Empires",
+          myVote: false,
+          votes: [
+            "a1",
+            "b2",
+            "c3"
+          ]
+        },
+        {
+          name: "Overwatch",
+          myVote: false,
+          votes: [
+            "c3"
+          ]
+        },
+        {
+          name: "PlayerUnknown's Battlegrounds",
+          myVote: false,
+          votes: [
+            "a1",
+            "c3"
           ]
         }
-      }
+      ]
+    }
+  }
+
+  export default {
+    data () {
+      return vueState;
     },
     methods: {
       castVote(item){
-        if (this.myUser.votes > 0) {
-          item.votes +=1;
+        if (this.myUser.votes > 0 && !_.includes(item.votes, this.myUser.id)) {
+          item.votes.push(this.myUser.id);
+          item.myVote = true;
           this.myUser.votes -=1;
         }
       },
       retractVote(item){
-        if (this.myUser.votes < 5 && item.votes > 0) {
-          item.votes -=1;
+        if (this.myUser.votes < userVoteCount && _.includes(item.votes, this.myUser.id)) {
+          _.pull(item.votes, this.myUser.id);
+          item.myVote = false;
           this.myUser.votes +=1;
         }
       },
       setAvatar(){
         console.log('getting user gravatar');
-        this.myUser.gravatar=`https://www.gravatar.com/avatar/${md5(this.myUser.email)}?s=45`;
         _.forEach(this.users, (user)=>{
           user.gravatar=`https://www.gravatar.com/avatar/${md5(user.email)}?s=45`;
         });
