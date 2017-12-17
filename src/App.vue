@@ -14,9 +14,9 @@
         <v-list-tile>
           Votes
         </v-list-tile>
-        <v-list-tile v-for="n in myVotes">
+        <v-list-tile v-for="n in myUser.votes">
             <v-avatar size="45px">
-              <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc?s=45">
+              <img :src="myUser.gravatar">
             </v-avatar>
         </v-list-tile>
       </v-list>
@@ -58,9 +58,9 @@
               {{ props.item.name }}
             </td>
             <td>
-              {{ props.item.votes }}
-              <v-avatar size="45px" v-for="n in props.item.votes">
-                <img src="https://www.gravatar.com/avatar/d8f74ac68d5a220a222372d2844729bc?s=45">
+              {{ props.item.votes.length }}
+              <v-avatar size="45px" v-for="userId in props.item.votes">
+                <img :src="users[userId].gravatar">
               </v-avatar>
             </td>
           </template>
@@ -81,10 +81,35 @@
 </template>
 
 <script>
+  import md5 from 'md5';
+  import _ from 'lodash';
+
   export default {
     data () {
       return {
-        myVotes: 5,
+        myUser: {
+          name: "Reid Stidolph",
+          email: "reidstidolph@gmail.com",
+          gravatar: null,
+          votes: 5
+        },
+        users: {
+          a1 : {
+            name: "Bob Jones",
+            email: "bob@foo.com",
+            gravatar: null
+          },
+          b2 : {
+            name: "Bill Bob",
+            email: "bill@foo.com",
+            gravatar: null
+          },
+          c3 : {
+            name: "Jane Doe",
+            email: "jane@foo.com",
+            gravatar: null
+          }
+        },
         gamesTable: {
           pagination: {
             sortBy: 'votes',
@@ -104,15 +129,24 @@
           items: [
             {
               name: "Battlefield 4",
-              votes: 1
+              votes: [
+                "a1"
+              ]
             },
             {
               name: "Call of Duty: Modern Warfare 2",
-              votes: 3
+              votes: [
+                "a1",
+                "b2"
+              ]
             },
             {
               name: "Left4Dead",
-              votes: 2
+              votes: [
+                "a1",
+                "b2",
+                "c3"
+              ]
             }
           ]
         }
@@ -120,17 +154,27 @@
     },
     methods: {
       castVote(item){
-        if (this.myVotes > 0) {
+        if (this.myUser.votes > 0) {
           item.votes +=1;
-          this.myVotes -=1;
+          this.myUser.votes -=1;
         }
       },
       retractVote(item){
-        if (this.myVotes < 5 && item.votes > 0) {
+        if (this.myUser.votes < 5 && item.votes > 0) {
           item.votes -=1;
-          this.myVotes +=1;
+          this.myUser.votes +=1;
         }
+      },
+      setAvatar(){
+        console.log('getting user gravatar');
+        this.myUser.gravatar=`https://www.gravatar.com/avatar/${md5(this.myUser.email)}?s=45`;
+        _.forEach(this.users, (user)=>{
+          user.gravatar=`https://www.gravatar.com/avatar/${md5(user.email)}?s=45`;
+        });
       }
+    },
+    mounted() {
+      this.setAvatar()
     }
   }
 </script>
